@@ -1,0 +1,42 @@
+<?php
+
+function _node_anon_field() {
+    return array(
+        'description' => 'Boolean indicating whether the node is anonymous',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+    );
+}
+
+/**
+ * Implements of hook_schema_alter().
+ */
+function node_anon_schema_alter(&$schema = array()) {
+    $schema['node']['fields']['anon'] = _node_anon_field();
+}
+
+/**
+ * Implements hook_install().
+ */
+function node_anon_install() {
+    $field = _node_anon_field();
+    if (!db_field_exists('node', 'anon')) {
+        db_add_field('node', 'anon', $field);
+    }
+    if (!db_field_exists('node_revision', 'anon')) {
+        db_add_field('node_revision', 'anon', $field);
+    }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function node_anon_uninstall() {
+    if (db_field_exists('node', 'anon')) {
+        db_drop_field('node', 'anon');
+    }
+    if (db_field_exists('node_revision', 'anon')) {
+        db_drop_field('node_revision', 'anon');
+    }
+}

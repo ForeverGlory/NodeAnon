@@ -1,0 +1,48 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+function node_anon_form_alter(&$form, &$form_state, &$form_id) {
+    if (strpos($form_id, '_node_form') !== FALSE) {
+        $form['anonymous'] = array(
+            '#title' => t('anonymous publish'),
+            '#weight' => '80',
+            '#type' => 'checkbox',
+            '#default_value' => isset($form['#node']->anonymous) ? $form['#node']->anonymous : NULL,
+        );
+    }
+}
+
+function node_anon_preprocess_username(&$variables) {
+    $entity = $variables['account'];
+    if (_node_anon_build_author_field($entity)) {
+        $variables['uid'] = $entity->uid;
+        $variables['name'] = $entity->name;
+        $variables['extra'] = '';
+        unset($variables['link_path']);
+    }
+}
+
+function node_anon_ds_fields_info_alter(&$fields, $entity_type) {
+    if ($entity_type == 'node') {
+        $fields['author']['function'] = 'node_anon_render_author_field';
+    }
+}
+
+function node_anon_render_author_field($field) {
+    $entity = $field['entity'];
+    _node_anon_build_author_field($entity);
+    return ds_render_author_field($field);
+}
+
+function _node_anon_build_author_field($entity) {
+    if (isset($entity->anonymous) && !empty($entity->anonymous)) {
+        $entity->uid = 0;
+        $entity->name = t('anonymous');
+        return true;
+    }
+}

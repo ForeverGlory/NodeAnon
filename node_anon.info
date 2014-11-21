@@ -1,0 +1,7 @@
+name = Node anonymous
+description = Publish node checked 'anonymous publish', node will hide user name, show 'anonymous'
+package = Node Additional
+dependencies[] = node
+
+core = 7.x
+version = 7.x-1.x
